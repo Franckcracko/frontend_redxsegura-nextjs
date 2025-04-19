@@ -1,4 +1,6 @@
-import { signUp } from "@aws-amplify/auth";
+import { signUp, resendSignUpCode } from "@aws-amplify/auth";
+import { redirect } from "next/navigation";
+
 export async function handleSignUp({
   firstName,
   middleName,
@@ -23,7 +25,30 @@ export async function handleSignUp({
         autoSignIn: true,
       },
     });
-  } catch (error) {}
+  } catch (error) {
+    return "Error signing up";
+  }
+  redirect("/auth/config-signup");
+}
+
+export async function handleSendEmailVerification({
+  email,
+}: {
+  email: string;
+}) {
+  try {
+    await resendSignUpCode({
+      username: email,
+    });
+
+    return {
+      message: "Verification code sent",
+    };
+  } catch (error) {
+    return {
+      message: "Error sending verification code",
+    };
+  }
 }
 
 export async function confirmSignUp() {
